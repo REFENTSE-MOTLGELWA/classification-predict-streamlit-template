@@ -21,10 +21,10 @@ class color:
     END = '\033[0m'
 
 
-df_sub = pd.read_csv('Kaggle_resources/datasets/sample_submission.csv')
-df_test = pd.read_csv('Kaggle_resources/datasets/test.csv')
+df_sub = pd.read_csv('resource2/datasets/sample_submission.csv')
+df_test = pd.read_csv('resource2/datasets/test.csv')
 test_df = df_test.set_index('tweetid')
-df_train = pd.read_csv('Kaggle_resources/datasets/train.csv')
+df_train = pd.read_csv('resource2/datasets/train.csv')
 train_df = df_train.set_index('tweetid')
 
 
@@ -33,10 +33,27 @@ train_df = df_train.set_index('tweetid')
 def explore_data():
     def view_data():
         return (train_df.head(), train_df.shape, test_df.head(), test_df.shape)
+    
+    def missing_values():
+        print(f'Missing values in train dataset:\n{train_df.isna().sum()}\n')
+        print(f'Missing values in test dataset:\n{test_df.isna().sum()}')
+
+    def empty_message():
+        # Checking for Empty messages in both train and test datasets
+
+        blanks_test = []
+        for tID,msg in test_df.itertuples():
+            if msg.isspace == True:
+                blanks_test.append(tID)
+
+        blanks_train = []
+        for tID,sent,msg in train_df.itertuples():
+            if msg.isspace == True:
+                blanks_test.append(tID)
 
     def null_value_check():
-        print(f'No. of empty messages in train: {len(blanks_train)}\n')
-        print(f'No. of empty messages in test: {len(blanks_test)}')
+        print(f'No. of empty messages in train: {len(empty_message.blanks_train)}\n')
+        print(f'No. of empty messages in test: {len(empty_message.blanks_test)}')
 
     def sentiment_distribution():
         # Count of classes in sentiment 

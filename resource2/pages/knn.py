@@ -4,7 +4,7 @@ This is the K Nearest Nieghbour web skeleton page
 
 # Streamlit dependencies
 import streamlit as st
-def write():
+def writer():
     """Used to write the page in the app.py file"""
     with st.spinner("Loading Home ..."):
         st.write(

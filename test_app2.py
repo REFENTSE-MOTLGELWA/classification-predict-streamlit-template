@@ -17,7 +17,7 @@ import eda
 import pandas as pd
 
 
-raw = pd.read_csv('Kaggle_resources/datasets/train.csv')
+raw = pd.read_csv('resource2/datasets/train.csv')
 
 model_page = {
     "Home": resource2.pages.home,
@@ -37,9 +37,32 @@ def main():
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
 	st.sidebar.title("PREDICTIONS")
-	selection = st.sidebar.selectbox("Choose Model", list(model_page.keys()))
+	selection = st.sidebar.radio("Choose Model", list(model_page.keys()))
 	
 	page = model_page[selection]
+
+
+
+	if selection == 'Home':
+		st.info("Prediction with KNN Model")
+		st.write(page)
+		# Creating a text box for user input
+		tweet_text = st.text_area("Enter Text","Type Here")
+
+		if st.button("Classify"):
+			# Transforming user input with vectorizer
+			### vect_text = tweet_cv.transform([tweet_text]).toarray()
+			# Load your .pkl file with the model of your choice + make predictions
+			# Try loading in multiple models to give the user a choice
+            
+			path = 'resource2/Models'
+
+			predictor = joblib.load(open(os.path.join(path,"KNN_01.pkl"),"rb"))
+			prediction = predictor.predict([tweet_text])
+
+			
+			st.success("Text Categorized as: {}".format(results))
+
 
 	# Building out the predication page
 	if selection == 'KNN':
@@ -54,15 +77,24 @@ def main():
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
             
-			path = 'Kaggle_resources/Models'
+			path = 'resource2/Models'
 
 			predictor = joblib.load(open(os.path.join(path,"KNN_01.pkl"),"rb"))
 			prediction = predictor.predict([tweet_text])
 
+			#if prediction == [1]:
+			#	results = 'Pro'
+			#if prediction == [-1]:
+			#	results = 'Anti'
+			#if prediction == [2]:
+			#	results = 'News'
+			#if prediction == [0]:
+			#	results = 'Neutral'
+
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
 			# more human interpretable.
-			st.success("Text Categorized as: {}".format(prediction))
+			st.success("Text Categorized as: {}".format(results))
 
 
 	elif selection == "LSVC":
@@ -77,20 +109,28 @@ def main():
 			# Load your .pkl file with the model of your choice + make predictions
 			# Try loading in multiple models to give the user a choice
             
-			path = 'Kaggle_resources/Models'
+			path = 'resource2/Models'
 
 			predictor = joblib.load(open(os.path.join(path,"LSVC_01.pkl"),"rb"))
 			prediction = predictor.predict([tweet_text])
+			if prediction == [1]:
+				results = 'Pro'
+			elif prediction == [-1]:
+				results = 'Anti'
+			elif prediction == [2]:
+				results = 'News'
+			elif prediction == [0]:
+				results = 'Neutral'
 
 			# When model has successfully run, will print prediction
 			# You can use a dictionary or similar structure to make this output
 			# more human interpretable.
-			st.success("Text Categorized as: {}".format(prediction))
+			st.success("Text Categorized as:   {}".format(results))
 
 	# Building out the "Information" page
 	st.sidebar.title("INFORMATION")
 	options = ["General", "Readme", "EDA", "Preprocessing"]
-	select_info = st.sidebar.selectbox("Choose Option", options)
+	select_info = st.sidebar.radio("Choose Option", options)
 	# Building out the "Information" page
 	if select_info == "General":
 		st.info("General Information")
