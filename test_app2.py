@@ -7,9 +7,7 @@ and fits the data to the model the pipeline wwas build with.
 import streamlit as st
 import joblib,os
 
-import resource2.pages.home
-import resource2.pages.knn
-import resource2.pages.lsvc
+
 import eda
 
 
@@ -19,11 +17,6 @@ import pandas as pd
 
 raw = pd.read_csv('resource2/datasets/train.csv')
 
-model_page = {
-    "Home": resource2.pages.home,
-    "KNN": resource2.pages.knn,
-    "LSVC": resource2.pages.lsvc,
-}
 
 # The main function where we will build the actual app
 def main():
@@ -31,78 +24,31 @@ def main():
 
 	# Creates a main title and subheader on your page -
 	# these are static across all pages
+	img = "resource2/images/logo.jpg"
+	st.image(img)
 	st.title("Tweet Classifer")
-	st.subheader("Climate change tweet classification")
+	#st.subheader("Climate change tweet classification")
 
-	# Creating sidebar with selection box -
-	# you can create multiple pages this way
+
+	# Creating predictions side bar
+	model_page = ["Home", "Lsvc", "Knn"]
 	st.sidebar.title("PREDICTIONS")
-	selection = st.sidebar.radio("Choose Model", list(model_page.keys()))
-	
-	page = model_page[selection]
-
-
+	selection = st.sidebar.radio("Choose Model", model_page)
 
 	if selection == 'Home':
-		st.info("Prediction with KNN Model")
-		st.write(page)
-		# Creating a text box for user input
-		tweet_text = st.text_area("Enter Text","Type Here")
+		st.info("Welcome to climate change sentiment analysis")
+		st.info("""Please select a model under PREDICTIONS to predict a tweet 
+		or make a selection under INFORMATION to get more information about the site, the exploratory data analysis and preprocessing.""")
 
-		if st.button("Classify"):
-			# Transforming user input with vectorizer
-			### vect_text = tweet_cv.transform([tweet_text]).toarray()
-			# Load your .pkl file with the model of your choice + make predictions
-			# Try loading in multiple models to give the user a choice
-            
-			path = 'resource2/Models'
-
-			predictor = joblib.load(open(os.path.join(path,"KNN_01.pkl"),"rb"))
-			prediction = predictor.predict([tweet_text])
-
-			
-			st.success("Text Categorized as: {}".format(results))
-
-
+		
 	# Building out the predication page
-	if selection == 'KNN':
-		st.info("Prediction with KNN Model")
-		st.write(page)
+
+	#Linear Support Vector classifier
+	if selection == "Lsvc":
+		st.info("Give brief info about Lsvc model")
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
-
-		if st.button("Classify"):
-			# Transforming user input with vectorizer
-			### vect_text = tweet_cv.transform([tweet_text]).toarray()
-			# Load your .pkl file with the model of your choice + make predictions
-			# Try loading in multiple models to give the user a choice
-            
-			path = 'resource2/Models'
-
-			predictor = joblib.load(open(os.path.join(path,"KNN_01.pkl"),"rb"))
-			prediction = predictor.predict([tweet_text])
-
-			#if prediction == [1]:
-			#	results = 'Pro'
-			#if prediction == [-1]:
-			#	results = 'Anti'
-			#if prediction == [2]:
-			#	results = 'News'
-			#if prediction == [0]:
-			#	results = 'Neutral'
-
-			# When model has successfully run, will print prediction
-			# You can use a dictionary or similar structure to make this output
-			# more human interpretable.
-			st.success("Text Categorized as: {}".format(results))
-
-
-	elif selection == "LSVC":
-		st.info("Prediction with LSVC Model")
-		st.write(page)
-		# Creating a text box for user input
-		tweet_text = st.text_area("Enter Text","Type Here")
-
+		
 		if st.button("Classify"):
 			# Transforming user input with vectorizer
 			### vect_text = tweet_cv.transform([tweet_text]).toarray()
@@ -126,6 +72,39 @@ def main():
 			# You can use a dictionary or similar structure to make this output
 			# more human interpretable.
 			st.success("Text Categorized as:   {}".format(results))
+
+	#K Nearest Neighbor
+	elif selection == 'Knn':
+		st.info("Give brief info about Knn model")
+		# Creating a text box for user input
+		tweet_text = st.text_area("Enter Text","Type Here")
+
+		if st.button("Classify"):
+			# Transforming user input with vectorizer
+			### vect_text = tweet_cv.transform([tweet_text]).toarray()
+			# Load your .pkl file with the model of your choice + make predictions
+			# Try loading in multiple models to give the user a choice
+            
+			path = 'resource2/Models'
+
+			predictor = joblib.load(open(os.path.join(path,"KNN_01.pkl"),"rb"))
+			prediction = predictor.predict([tweet_text])
+
+			if prediction == [1]:
+				results = 'Pro'
+			if prediction == [-1]:
+				results = 'Anti'
+			if prediction == [2]:
+				results = 'News'
+			if prediction == [0]:
+				results = 'Neutral'
+
+			# When model has successfully run, will print prediction
+			# You can use a dictionary or similar structure to make this output
+			# more human interpretable.
+			st.success("Text Categorized as: {}".format(results))
+
+
 
 	# Building out the "Information" page
 	st.sidebar.title("INFORMATION")
@@ -151,15 +130,16 @@ def main():
 
 	if select_info == "EDA":
 		st.info("EDA")
-		our_eda = eda.explore_data()
-		st.success(our_eda)
+		#our_eda = eda.explore_data()
+		#st.success(our_eda)
+		st.markdown("Display the EDA here")
 
 
 
 	if select_info == "Preprocessing":
 		st.info("Preprocessing")
 		# You can read a markdown file from supporting resources folder
-		st.markdown("Put the PREPROCESSING here")
+		st.markdown("Display the PREPROCESSING here")
 
 
 		
