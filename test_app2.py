@@ -41,8 +41,8 @@ train_df = df_train.set_index('tweetid')
 
 head_train = train_df.head()
 head_train_shape = train_df.shape
-head_test = train_df.head()
-head_test_shape = train_df.shape
+head_test = test_df.head()
+head_test_shape = test_df.shape
 
  
 
