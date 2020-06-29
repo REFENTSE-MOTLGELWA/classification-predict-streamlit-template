@@ -6,15 +6,19 @@ and fits the data to the model the pipeline wwas build with.
 # Streamlit dependencies
 import streamlit as st
 import joblib,os
-import numpy as np
 import pandas as pd
+import numpy as np
+#from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import matplotlib.pyplot as plt
 import seaborn as sns
+import string
 import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import TreebankWordTokenizer
+from nltk import SnowballStemmer
+from nltk.stem import WordNetLemmatizer
 #import spacy
-import re
-#import emoji
-
+#from PIL import Image
 
 #df_sub = pd.read_csv('resource2/datasets/sample_submission.csv')
 df_test = pd.read_csv('resource2/datasets/test.csv')
@@ -46,6 +50,20 @@ def main():
 	# For selecting side bars
 	if selection == 'HOME':
 		st.markdown(open("resource2/info.md").read())
+		st.subheader("Raw Twitter data and label")
+		
+		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
+			values = st.slider("Slide to the right to select and view quantity",0, 16000)
+			st.write(df_train[0:values])
+
+			sub_data = ["Train Data Shape", "Test Data Shape"]
+			data_select = st.selectbox("View Data Shape", sub_data)
+
+			if data_select == "Train Data Shape":	
+				st.write(df_train.shape)
+
+			elif data_select == "Test Data Shape":
+				st.write(df_test.shape)
 	
 
 	# Building out the predication page
@@ -120,23 +138,8 @@ def main():
 		
 	elif selection == "EDA":
 		st.subheader("Exploratry Data Analysis")
-		st.markdown("Raw Twitter data and label")
 		
-		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-			values = st.slider("Slide to Select Amount of Data to View",0, 16000)
-			st.write(df_train[0:values])
-
-			sub_data = ["Train Data Shape", "Test Data Shape"]
-			data_select = st.selectbox("View Data Shape", sub_data)
-
-			if data_select == "Train Data Shape":	
-				st.write(df_train.shape)
-
-			elif data_select == "Test Data Shape":
-				st.write(df_test.shape)
-
-		
-		elif st.checkbox('Display sentiment distribution'): # data is hidden if box is unchecked
+		if st.checkbox('Display sentiment distribution'): # data is hidden if box is unchecked
 			# Count of classes in sentiment 
 			plt.figure(figsize=(10, 6))
 			sns.set(style="darkgrid")
@@ -144,55 +147,28 @@ def main():
 			ax.set_title("No. of tweets per sentiment")
 			st.pyplot()
 
-			train_df['length'] = train_df['message'].apply(len)
-			g = sns.FacetGrid(data=train_df, col='sentiment', col_wrap=4)
-			g.map(plt.hist, 'length', bins = 20, color = 'g')
+			# train_df['length'] = train_df['message'].apply(len)
+			# g = sns.FacetGrid(data=train_df, col='sentiment', col_wrap=4)
+			# g.map(plt.hist, 'length', bins = 20, color = 'g')
+			# st.pyplot()
+
+			df_train['length'] = df_train['message'].apply(len)
+			graph = sns.FacetGrid(data=df_train, col = 'sentiment', 
+								col_wrap=2, height=3, aspect=2)
+			graph.map(plt.hist, 'length', bins = 30, color = 'g')
 			st.pyplot()
 
 		elif st.checkbox("View the word cloud"):
-			# Data frame for each sentiment
-			train_anti = train_df[train_df['sentiment'] == -1]
-			train_neutral = train_df[train_df['sentiment'] == 0]
-			train_pro = train_df[train_df['sentiment'] == 1]
-			train_news = train_df[train_df['sentiment'] == 2]
-
-			# Joining all the messages for each sentinment into one string
-			tweet_anti = ''.join(tweet for tweet in train_anti['message'])
-			tweet_neutral = ''.join(tweet for tweet in train_neutral['message'])
-			tweet_pro = ''.join(tweet for tweet in train_pro['message'])
-			tweet_news = ''.join(tweet for tweet in train_news['message'])
-
 			# Create and generate a word cloud image
-			fig, ax = plt.subplots(2,2, figsize=(15,10))
-
-			wordcloud_anti = WordCloud(max_font_size=50, max_words=100,
-									background_color='white').generate(tweet_anti)
-
-			wordcloud_neutral = WordCloud(max_font_size=50, max_words=100,
-									background_color='white').generate(tweet_neutral)
-
-			wordcloud_pro = WordCloud(max_font_size=50, max_words=100,
-									background_color='white').generate(tweet_pro)
-
-			wordcloud_news = WordCloud(max_font_size=50, max_words=100,
-									background_color='white').generate(tweet_news)
-
+			fig, ax = plt.subplots(figsize=(15, 15))
+			tweet = ''.join(tweet for tweet in train_df['message'])
+			wordcloud = WordCloud(max_font_size=50, max_words=100,
+									background_color='white').generate(tweet)
 			# Displaying the images
-			ax[0,0].imshow(wordcloud_anti, interpolation='bilinear')
-			ax[0,0].set_title('Anti sentiment tweets', fontsize=20)
-			ax[0,0].axis('off')
-
-			ax[0,1].imshow(wordcloud_neutral, interpolation='bilinear')
-			ax[0,1].set_title('Neutral sentiment tweets', fontsize=20)
-			ax[0,1].axis('off')
-
-			ax[1,0].imshow(wordcloud_pro, interpolation='bilinear')
-			ax[1,0].set_title('Pro sentiment tweets', fontsize=20)
-			ax[1,0].axis('off')
-
-			ax[1,1].imshow(wordcloud_news, interpolation='bilinear')
-			ax[1,1].set_title('News sentiment tweets', fontsize=20)
-			ax[1,1].axis('off')
+			ax.imshow(wordcloud, interpolation='bilinear')
+			ax.set_title('Word cloud for all sentiments', fontsize=20)
+			ax.axis('off')
+			st.pyplot()
 
 
 
