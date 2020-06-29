@@ -39,7 +39,7 @@ def main():
 	st.title("Tweet Classifer")
 
 	# Creating side bar for navigation
-	navigation = ["HOME", "PREDICTIONS", "EDA", "INSIGHTS", "ABOUT TEAM", "READMEfile"]
+	navigation = ["HOME", "PREDICTIONS", "EDA", "INSIGHTS", "ABOUT TEAM", "README"]
 	st.sidebar.title("NAVIGATION")
 	selection = st.sidebar.radio(" ",navigation)
 
@@ -75,7 +75,7 @@ def main():
 		#Linear Support Vector classifier
 		if model_select == "LSVC":
 			#What is the model about
-			st.markdown("replace text with description of Linear Support Vector Classifier model")
+			st.markdown("Support Vector Machine (SVM) we plot each data item as a point in n-dimensional space (where n is number of features you have) with the value of each feature being the value of a particular coordinate. Then, we perform classification by finding the hyper-plane that differentiates the two classes very well.")
 			#
 			if st.button("Classify"):
 				# Transforming user input with vectorizer
@@ -101,7 +101,7 @@ def main():
 
 		#K Nearest Neighbor
 		elif model_select == 'KNN':
-			st.markdown("replace text with description of K Nearest Neighbor model")
+			st.markdown("KNN works by finding the distances between a query and all the examples in the data, selecting the specified number examples (K) closest to the query, then votes for the most frequent label (in the case of classification) or averages the labels (in the case of regression).")
 
 			if st.button("Classify"):
 				# Transforming user input with vectorizer
@@ -127,7 +127,7 @@ def main():
 
 
 		elif model_select == 'MultiNB':
-			st.markdown("replace text with description of MultiNB model")
+			st.markdown("Naive Bayes classification technique is based on Bayes’ Theorem with an assumption of independence among predictors. A Naive Bayes classifier assumes that the presence of a particular feature in a classs is unrelated to the presence of any other feature. This algorithm is also well known for multi class prediction feature. This model can predict the probability of multiple classes of the target variable.")
 
 			if st.button("Classify"):
 				# Transforming user input with vectorizer
