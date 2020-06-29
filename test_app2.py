@@ -8,7 +8,7 @@ import streamlit as st
 import joblib,os
 import pandas as pd
 import numpy as np
-#from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import matplotlib.pyplot as plt
 import seaborn as sns
 import string
@@ -17,10 +17,10 @@ from nltk.corpus import stopwords
 from nltk.tokenize import TreebankWordTokenizer
 from nltk import SnowballStemmer
 from nltk.stem import WordNetLemmatizer
-#import spacy
+import spacy
 #from PIL import Image
 
-#df_sub = pd.read_csv('resource2/datasets/sample_submission.csv')
+
 df_test = pd.read_csv('resource2/datasets/test.csv')
 test_df = df_test.set_index('tweetid')
 df_train = pd.read_csv('resource2/datasets/train.csv')
