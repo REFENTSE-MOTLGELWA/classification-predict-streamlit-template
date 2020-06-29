@@ -172,11 +172,7 @@ def main():
 			ax.set_title("No. of tweets per sentiment")
 			st.pyplot()
 
-			# train_df['length'] = train_df['message'].apply(len)
-			# g = sns.FacetGrid(data=train_df, col='sentiment', col_wrap=4)
-			# g.map(plt.hist, 'length', bins = 20, color = 'g')
-			# st.pyplot()
-
+		
 			df_train['length'] = df_train['message'].apply(len)
 			graph = sns.FacetGrid(data=df_train, col = 'sentiment', 
 								col_wrap=2, height=3, aspect=2)
