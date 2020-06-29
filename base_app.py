@@ -10,7 +10,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-#from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import string
 import nltk
 from nltk.corpus import stopwords
@@ -20,7 +19,7 @@ from nltk.stem import WordNetLemmatizer
 #import spacy
 #from PIL import Image
 
-
+#import dataset
 df_test = pd.read_csv('resources/datasets/test.csv')
 test_df = df_test.set_index('tweetid')
 df_train = pd.read_csv('resources/datasets/train.csv')
@@ -69,7 +68,7 @@ def main():
 		#Creating a text box for user input
 		tweet_text = st.text_area("Enter some text below:","")
 		#List of models
-		model_list = ["LSVC", "KNN"]
+		model_list = ["LSVC", "KNN", "MultiNB"]
 		#Model selection drop down
 		model_select = st.selectbox("Choose Model:", model_list)
 
@@ -125,6 +124,34 @@ def main():
 					results = 'Neutral'
 				#prediction output	
 				st.success("Text Categorized as: {}".format(results))
+
+
+		elif model_select == 'MultiNB':
+			st.markdown("replace text with description of MultiNB model")
+
+			if st.button("Classify"):
+				# Transforming user input with vectorizer
+				### vect_text = tweet_cv.transform([tweet_text]).toarray()
+				# Load your .pkl file with the model of your choice + make predictions
+				# Try loading in multiple models to give the user a choice
+				
+				path = 'resources/models'
+
+				predictor = joblib.load(open(os.path.join(path,"MultiNB.pkl"),"rb"))
+				prediction = predictor.predict([tweet_text])
+				#change prediction out to display in more human interpretable 
+				if prediction == [1]:
+					results = 'Pro'
+				if prediction == [-1]:
+					results = 'Anti'
+				if prediction == [2]:
+					results = 'News'
+				if prediction == [0]:
+					results = 'Neutral'
+				#prediction output	
+				st.success("Text Categorized as: {}".format(results))
+
+
 		st.subheader("Meaning of different categories")
 		st.info("Pro - the tweet supports the belief of man-made climate change")
 		st.info("Anti - the tweet does not believe in man-made climate change")
@@ -156,17 +183,6 @@ def main():
 			graph.map(plt.hist, 'length', bins = 30, color = 'g')
 			st.pyplot()
 
-		elif st.checkbox("View the word cloud"):
-			# Create and generate a word cloud image
-			fig, ax = plt.subplots(figsize=(15, 15))
-			tweet = ''.join(tweet for tweet in train_df['message'])
-			wordcloud = WordCloud(max_font_size=50, max_words=100,
-									background_color='white').generate(tweet)
-			# Displaying the images
-			ax.imshow(wordcloud, interpolation='bilinear')
-			ax.set_title('Word cloud for all sentiments', fontsize=20)
-			ax.axis('off')
-			st.pyplot()
 
 
 
@@ -189,7 +205,7 @@ def main():
 		#Display info about team 
 		st.markdown(open("team.md").read())
 
-	elif selection == "READMEfile":
+	elif selection == "README":
 		#Display readme page
 		st.markdown(open("README.md").read())
 
