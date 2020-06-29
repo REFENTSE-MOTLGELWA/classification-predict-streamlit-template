@@ -6,79 +6,29 @@ and fits the data to the model the pipeline wwas build with.
 # Streamlit dependencies
 import streamlit as st
 import joblib,os
-import numpy as np
 import pandas as pd
+import numpy as np
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import matplotlib.pyplot as plt
 import seaborn as sns
+import string
 import nltk
-#import spacy
-import re
-#import emoji
-
-# For printing option and text color
-class color:
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    DARKCYAN = '\033[36m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
+from nltk.corpus import stopwords
+from nltk.tokenize import TreebankWordTokenizer
+from nltk import SnowballStemmer
+from nltk.stem import WordNetLemmatizer
+import spacy
+#from PIL import Image
 
 
-
-raw = pd.read_csv('resource2/datasets/train.csv')
-
-#df_sub = pd.read_csv('resource2/datasets/sample_submission.csv')
 df_test = pd.read_csv('resource2/datasets/test.csv')
 test_df = df_test.set_index('tweetid')
 df_train = pd.read_csv('resource2/datasets/train.csv')
 train_df = df_train.set_index('tweetid')
-
-
-head_train = train_df.head()
-head_train_shape = train_df.shape
-head_test = test_df.head()
-head_test_shape = test_df.shape
-
  
 
 missing_train = train_df.isna().sum()
 missing_test = test_df.isna().sum()
-
-# Count of classes in sentiment 
-sns.set(style="darkgrid",palette='summer')
-ax = sns.countplot(x='sentiment', data=train_df)
-	
-
-def empty_message():
-	blanks_test = []
-	for tID,msg in test_df.itertuples():
-		if msg.isspace == True:
-			blanks_test.append(tID)
-
-	blanks_train = []
-	for tID,sent,msg in train_df.itertuples():
-		if msg.isspace == True:
-			blanks_test.append(tID)
-	return blanks_train, blanks_test
-
-def null_value_check():
-	print(f'No. of empty messages in train: {len(empty_message.blanks_train)}\n')
-	print(f'No. of empty messages in test: {len(empty_message.blanks_test)}')
-
-
-
-
-def class_dist_perct():
-	print(color.BOLD +'Percentage of a particular `Class` in the train dataset\n'+ color.END)
-	print(f'Class 2 ~ News \n{round((df_train.sentiment.value_counts()[2]/len(df_train))*100,2)} %\n')
-	print(f'Class 1 ~ Pro \n{round((df_train.sentiment.value_counts()[1]/len(df_train))*100,2)} %\n')
-	print(f'Class 0 ~ Neutral \n{round((df_train.sentiment.value_counts()[0]/len(df_train))*100,2)} %\n')
-	print(f'Class -1 ~ Anti \n{round((df_train.sentiment.value_counts()[-1]/len(df_train))*100,2)} %')
 
 
 # The main function where we will build the actual app
@@ -90,33 +40,45 @@ def main():
 	img = "resource2/images/logo.jpg"
 	st.image(img, caption="It is what it is")
 	st.title("Tweet Classifer")
-	#st.subheader("Climate change tweet classification")
 
-
-	# Creating side bar
-	navigation = ["HOME", "PREDICTIONS", "INSIGHTS", "EDA", "ABOUT TEAM", "READMEfile"]
+	# Creating side bar for navigation
+	navigation = ["HOME", "PREDICTIONS", "EDA", "INSIGHTS", "ABOUT TEAM", "READMEfile"]
 	st.sidebar.title("NAVIGATION")
-	selection = st.sidebar.radio("make your selection",navigation)
+	selection = st.sidebar.radio(" ",navigation)
+
 
 	# For selecting side bars
 	if selection == 'HOME':
 		st.markdown(open("resource2/info.md").read())
+		st.subheader("Raw Twitter data and label")
+		
+		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
+			values = st.slider("Slide to the right to select and view quantity",0, 16000)
+			st.write(df_train[0:values])
+
+			sub_data = ["Train Data Shape", "Test Data Shape"]
+			data_select = st.selectbox("View Data Shape", sub_data)
+
+			if data_select == "Train Data Shape":	
+				st.write(df_train.shape)
+
+			elif data_select == "Test Data Shape":
+				st.write(df_test.shape)
 	
 
-		
 	# Building out the predication page
 	elif selection == "PREDICTIONS":
 		#Creating a text box for user input
-		tweet_text = st.text_area("Enter Text","Type Here")
+		tweet_text = st.text_area("Enter some text below:","")
 		#List of models
 		model_list = ["LSVC", "KNN"]
-		#Model selection
-		model_select = st.selectbox("Choose Model", model_list)
+		#Model selection drop down
+		model_select = st.selectbox("Choose Model:", model_list)
 
 		#Linear Support Vector classifier
 		if model_select == "LSVC":
 			#What is the model about
-			st.info("Give brief info about Linear Support Vector Classifier model")
+			st.markdown("replace text with description of Linear Support Vector Classifier model")
 			#
 			if st.button("Classify"):
 				# Transforming user input with vectorizer
@@ -142,7 +104,7 @@ def main():
 
 		#K Nearest Neighbor
 		elif model_select == 'KNN':
-			st.info("Give brief info about K Nearest Neighbor model")
+			st.markdown("replace text with description of K Nearest Neighbor model")
 
 			if st.button("Classify"):
 				# Transforming user input with vectorizer
@@ -165,39 +127,65 @@ def main():
 					results = 'Neutral'
 				#prediction output	
 				st.success("Text Categorized as: {}".format(results))
-		st.subheader("Meaning of different output")
-		st.markdown("Pro - the tweet supports the belief of man-made climate change")
-		st.markdown("Anti - the tweet does not believe in man-made climate change")
-		st.markdown("Neutral - the tweet neither supports nor refutes the belief of man-made climate change")
-		st.markdown("News - the tweet links to factual news about climate change")
+		st.subheader("Meaning of different categories")
+		st.info("Pro - the tweet supports the belief of man-made climate change")
+		st.info("Anti - the tweet does not believe in man-made climate change")
+		st.info("Neutral - the tweet neither supports nor refutes the belief of man-made climate change")
+		st.info("News - the tweet links to factual news about climate change")
 
 	
-	# Building out the "Information" page
+	# Building out the "Information" paga
+		
+	elif selection == "EDA":
+		st.subheader("Exploratry Data Analysis")
+		
+		if st.checkbox('Display sentiment distribution'): # data is hidden if box is unchecked
+			# Count of classes in sentiment 
+			plt.figure(figsize=(10, 6))
+			sns.set(style="darkgrid")
+			ax = sns.countplot(x='sentiment', data=train_df)
+			ax.set_title("No. of tweets per sentiment")
+			st.pyplot()
+
+			# train_df['length'] = train_df['message'].apply(len)
+			# g = sns.FacetGrid(data=train_df, col='sentiment', col_wrap=4)
+			# g.map(plt.hist, 'length', bins = 20, color = 'g')
+			# st.pyplot()
+
+			df_train['length'] = df_train['message'].apply(len)
+			graph = sns.FacetGrid(data=df_train, col = 'sentiment', 
+								col_wrap=2, height=3, aspect=2)
+			graph.map(plt.hist, 'length', bins = 30, color = 'g')
+			st.pyplot()
+
+		elif st.checkbox("View the word cloud"):
+			# Create and generate a word cloud image
+			fig, ax = plt.subplots(figsize=(15, 15))
+			tweet = ''.join(tweet for tweet in train_df['message'])
+			wordcloud = WordCloud(max_font_size=50, max_words=100,
+									background_color='white').generate(tweet)
+			# Displaying the images
+			ax.imshow(wordcloud, interpolation='bilinear')
+			ax.set_title('Word cloud for all sentiments', fontsize=20)
+			ax.axis('off')
+			st.pyplot()
+
+
+
 	elif selection == "INSIGHTS":
 		st.info("Our insights goes here")
+		news_class = round((train_df.sentiment.value_counts()[2]/len(train_df))*100,2)
+		pro_class = round((train_df.sentiment.value_counts()[1]/len(train_df))*100,2)
+		neutral_class = round((train_df.sentiment.value_counts()[0]/len(train_df))*100,2)
+		anti_class = round((train_df.sentiment.value_counts()[-1]/len(train_df))*100,2)
 
-	elif selection == "EDA":
-		st.markdown("Display the EDA here")
-		st.subheader("Raw Twitter data and label")
-		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-			sub_data = ["Train Head Data", "Train Data Shape", "Test Head Data", "Test Data Shape"]
-			st.write(raw[['sentiment', 'message']]) # will write the df to the page
-			data_select = st.selectbox("Choose data", sub_data)
-			if data_select == "Train Head Data":
-				st.write(head_train)
-
-			elif data_select == "Train Data Shape":	
-				st.write(head_train_shape)
-
-			elif data_select == "Test Head Data":
-				st.write(head_test)
-
-			elif data_select == "Test Data Shape":
-				st.write(head_test_shape)
-
-		
-		elif st.checkbox('Display sentiment distribution'): # data is hidden if box is unchecked
-			st.write(ax)
+		data = [news_class,pro_class, neutral_class, anti_class]
+		classes = 'News','Pro','Neutral','Anti'
+		my_colors = ['lightblue','lightyellow','pink', 'violet']
+		plt.pie(data,labels=classes,autopct='%1.1f%%', colors=my_colors)
+		plt.title('Sentiment distribution in train data')
+		plt.axis('equal')
+		st.pyplot()
 
 	elif selection == "ABOUT TEAM":
 		#Display info about team 

@@ -5,7 +5,7 @@
 ### It will be replaced with the correct content
 
 
-## Evans Morema - Team Leader
+## Evans Marema - Team Leader
 ![Evans Marema](resource2/images/logo.jpg)
 
 The central processing unit - Ensures the different application of system work well together. 
@@ -13,14 +13,15 @@ The engine that ensures the the phone is up and running
 
 
 ## Vinita Maharaj
-![Vinita Maharaj](resource2/images/logo.jpg)
+![Vinita Maharaj]("resource2/images/V.jpg")
+
 
 The RAM - Ensures the system info is available at finger tips. 
 Data is needed right on time otherwise the sytem will collapse
 
 
 ## Gugu Mtonjeni
-![Gugu Mtonjeni](resource2/images/logo.jpg)
+![Gugu Mtonjeni](resource2/images/Gugu.jpg)
 
 The Display - Screen that ensures you see whats in the phone
 It always good to see the end results being displayed beautifully
